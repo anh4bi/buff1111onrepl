@@ -1,162 +1,117 @@
-# Common
-from io import BytesIO
-import aiohttp
+import urllib.request
+import json
+import datetime
+import random
+import string
+import time
 import os
-
-# Discord Library
-from discord import Embed, File
-from discord.ext import commands
-
-# Local
-from features.common import get_quote_api, get_covid_api
-from features.images import get_image, get_image_nsfw
-from features.keep_alive import keep_alive
-
-PREFIX = os.getenv('PREFIX')
-TOKEN = os.getenv('TOKEN')
-
-client = commands.Bot(command_prefix=PREFIX)
-
-
-@client.event
-async def on_ready():
-    print(f'{client.user.name} has connected to Discord!')
-
-
-@client.command(name='hello')
-async def hello(ctx):
-    await ctx.send('Hello cái địt mẹ mày.')
-
-
-"""
-Common
-"""
+import sys
+from keep_alive import keep_alive
+os.system("title WARP-PLUS-CLOUDFLARE By ALIILAPRO")
+os.system('cls' if os.name == 'nt' else 'clear')
+print(
+    '      _______ _      __________________       _______ _______ _______ _______\n'
+    '     (  ___  | \     \__   __|__   __( \     (  ___  |  ____ |  ____ |  ___  )\n'
+    '     | (   ) | (        ) (     ) (  | (     | (   ) | (    )| (    )| (   ) |\n'
+    '     | (___) | |        | |     | |  | |     | (___) | (____)| (____)| |   | |\n'
+    '     |  ___  | |        | |     | |  | |     |  ___  |  _____)     __) |   | |\n'
+    '     | (   ) | |        | |     | |  | |     | (   ) | (     | (\ (  | |   | |\n'
+    '     | )   ( | (____/\__) (_____) (__| (____/\ )   ( | )     | ) \ \_| (___) |\n'
+    '     |/     \(_______|_______|_______(_______//     \|/      |/   \__(_______)\n'
+)
+print("[+] ABOUT SCRIPT:")
+print("[-] With this script, you can getting unlimited GB on Warp+.")
+print("[-] Version: 4.0.0")
+print("--------")
+print("[+] THIS SCRIPT CODDED BY ALIILAPRO")
+print("[-] SITE: aliilapro.github.io")
+print("[-] TELEGRAM: aliilapro")
+print("--------")
+referrer = os.getenv('ID')
 
 
-@client.command(name='quote')
-async def get_quote(ctx):
-    quote = get_quote_api()
-    await ctx.send(Embed(title=quote))
+def genString(stringLength):
+    try:
+        letters = string.ascii_letters + string.digits
+        return ''.join(random.choice(letters) for i in range(stringLength))
+    except Exception as error:
+        print(error)
 
 
-@client.command(name='covid')
-async def covid(ctx):
-    data = get_covid_api()
-    embed_message = Embed(title="COVID-19", color=0xe74c3c)
-    embed_message.add_field(
-        name='Thế Giới',
-        value='Thông tin về dịch ở ngoài Thế giới.',
-        inline=False)
-    embed_message.add_field(
-        name='Đang điều trị', value=data[0][0], inline=True)
-    embed_message.add_field(name='Khỏi', value=data[0][1], inline=True)
-    embed_message.add_field(name='Tử vong', value=data[0][2], inline=True)
-
-    embed_message.add_field(
-        name='Việt Nam', value='Thông tin về dịch ở Việt Nam.', inline=False)
-    embed_message.add_field(
-        name='Đang điều trị', value=data[1][0], inline=True)
-    embed_message.add_field(name='Khỏi', value=data[1][1], inline=True)
-    embed_message.add_field(name='Tử vong', value=data[1][2], inline=True)
-    embed_message.set_footer(text="API từ Mạnh Tuấn J2Team")
-    await ctx.send(embed=embed_message)
+def digitString(stringLength):
+    try:
+        digit = string.digits
+        return ''.join((random.choice(digit) for i in range(stringLength)))
+    except Exception as error:
+        print(error)
 
 
-@client.command(name='say')
-async def say_name(ctx, arg=None):
-    if arg is None:
-        await ctx.send("Mày đéo đưa tên thì tao đọc bằng gì???")
-    await ctx.send(f'Địt con mẹ mầy, {arg}')
+url = f'https://api.cloudflareclient.com/v0a{digitString(3)}/reg'
 
 
-@client.command(name='me')
-async def get_info_me(ctx):
-    author = ctx.message.author
-    _embed = Embed(title=author.name, color=0x3498db)
-    _embed.add_field(name='Rank', value='Admin', inline=True)
-    _embed.add_field(name='Point', value='99999', inline=True)
-    _embed.add_field(name='Cash', value='999999999', inline=False)
-    _embed.set_thumbnail(url=author.avatar_url)
-    await ctx.send(embed=_embed)
+def run():
+    try:
+        install_id = genString(22)
+        body = {
+            "key": "{}=".format(genString(43)),
+            "install_id": install_id,
+            "fcm_token": "{}:APA91b{}".format(install_id, genString(134)),
+            "referrer": referrer,
+            "warp_enabled": False,
+            "tos": datetime.datetime.now().isoformat()[:-3] + "+02:00",
+            "type": "Android",
+            "locale": "es_ES"
+        }
+        data = json.dumps(body).encode('utf8')
+        headers = {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Host': 'api.cloudflareclient.com',
+            'Connection': 'Keep-Alive',
+            'Accept-Encoding': 'gzip',
+            'User-Agent': 'okhttp/3.12.1'
+        }
+        req = urllib.request.Request(url, data, headers)
+        response = urllib.request.urlopen(req)
+        status_code = response.getcode()
+        return status_code
+    except Exception as error:
+        print(error)
 
 
-"""
-Images
-"""
-
-
-@client.command(name='roses')
-async def send_roses_image(ctx):
-    image_url = get_image('roses')
-    async with aiohttp.ClientSession() as session:
-        # note that it is often preferable to create a single session to use multiple times later - see below for this.
-        async with session.get(image_url) as resp:
-            buffer = BytesIO(await resp.read())
-    await ctx.send(file=File(fp=buffer, filename="roses_blackpink.jpg"))
-
-
-@client.command(name='get')
-async def send_img(ctx, arg=None):
-    if arg is None:
-        await ctx.send("Đmm, thiếu tham số kìa.")
-    image_url = get_image(str(arg))
-    async with aiohttp.ClientSession() as session:
-        # note that it is often preferable to create a single session to use multiple times later - see below for this.
-        async with session.get(image_url) as resp:
-            buffer = BytesIO(await resp.read())
-    await ctx.send(file=File(fp=buffer, filename="something.jpg"))
-
-
-@client.command(name='meme')
-async def send_meme(ctx):
-    image_url = get_image('meme')
-    async with aiohttp.ClientSession() as session:
-        # note that it is often preferable to create a single session to use multiple times later - see below for this.
-        async with session.get(image_url) as resp:
-            buffer = BytesIO(await resp.read())
-    await ctx.send(file=File(fp=buffer, filename="meme.jpg"))
-
-
-@client.command(name='beauty')
-async def send_beauty(ctx):
-    image_url = get_image('beauty')
-    async with aiohttp.ClientSession() as session:
-        # note that it is often preferable to create a single session to use multiple times later - see below for this.
-        async with session.get(image_url) as resp:
-            buffer = BytesIO(await resp.read())
-    await ctx.send(file=File(fp=buffer, filename="beauty.jpg"))
-
-
-@client.command(name='mlem')
-async def send_mlem(ctx):
-    image_url = get_image('mlem')
-    async with aiohttp.ClientSession() as session:
-        # note that it is often preferable to create a single session to use multiple times later - see below for this.
-        async with session.get(image_url) as resp:
-            buffer = BytesIO(await resp.read())
-    await ctx.send(file=File(fp=buffer, filename="mlem.jpg"))
-
-
-'''
-No Safe For Work
-'''
-
-
-@client.command(name='nsfw')
-async def send_img_nsfw(ctx, arg=None):
-    if arg is None:
-        await ctx.send("Đmm, thiếu tham số kìa.")
-    image_url = get_image_nsfw(str(arg))
-    async with aiohttp.ClientSession() as session:
-        # note that it is often preferable to create a single session to use multiple times later - see below for this.
-        async with session.get(image_url) as resp:
-            buffer = BytesIO(await resp.read())
-    await ctx.send(file=File(fp=buffer, filename="nsfw.jpg"))
-
-
-"""
-Games
-"""
-
-keep_alive()
-client.run(TOKEN)
+g = 0
+b = 0
+while True:
+    keep_alive()
+    result = run()
+    if result == 200:
+        g = g + 1
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("")
+        print("                  WARP-PLUS-CLOUDFLARE (script)" +
+              " By ALIILAPRO")
+        print("")
+        animation = [
+            "[■□□□□□□□□□] 10%", "[■■□□□□□□□□] 20%", "[■■■□□□□□□□] 30%",
+            "[■■■■□□□□□□] 40%", "[■■■■■□□□□□] 50%", "[■■■■■■□□□□] 60%",
+            "[■■■■■■■□□□] 70%", "[■■■■■■■■□□] 80%", "[■■■■■■■■■□] 90%",
+            "[■■■■■■■■■■] 100%"
+        ]
+        for i in range(len(animation)):
+            time.sleep(0.5)
+            sys.stdout.write("\r[+] Preparing... " +
+                             animation[i % len(animation)])
+            sys.stdout.flush()
+        print(f"\n[-] WORK ON ID: {referrer}")
+        print(f"[:)] {g} GB has been successfully added to your account.")
+        print(f"[#] Total: {g} Good {b} Bad")
+        print("[*] After 18 seconds, a new request will be sent.")
+        time.sleep(18)
+    else:
+        b = b + 1
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("")
+        print("                  WARP-PLUS-CLOUDFLARE (script)" +
+              " By ALIILAPRO")
+        print("")
+        print("[:(] Error when connecting to server.")
+        print(f"[#] Total: {g} Good {b} Bad")
